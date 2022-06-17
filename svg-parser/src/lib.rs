@@ -3,11 +3,11 @@
 mod checks;
 mod error;
 
+mod css_parse;
 mod number;
 mod span;
 mod stream;
 mod xml_parse;
-mod css_parse;
 
 use stream::SvgStream;
 

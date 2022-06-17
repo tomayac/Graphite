@@ -48,6 +48,7 @@ pub enum SvgErrorType {
 	UnknownNamespace,
 	DuplicateAttribute,
 	InvalidCloseElement,
+	CssInvalidString,
 }
 
 pub struct SvgError(pub SvgErrorType, pub StreamError, pub ErrorPos);
