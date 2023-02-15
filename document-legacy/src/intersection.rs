@@ -498,7 +498,7 @@ pub fn overlapping_curve_intersections(a: &PathSeg, b: &PathSeg) -> [Option<Inte
 				t2a = b_on_a[1].unwrap();
 				t2b = 1.0;
 				let mut split_at = if t1a > t2a { [t2a, t1a] } else { [t1a, t2a] };
-				(*b, subdivide_path_seg(a, &mut split_at)[1].unwrap())
+				(*b, subdivide_path_seg(a, &mut split_at)[1].unwrap()) // TODO: This line results in a crash: https://files.keavon.com/-/FixedLightSamoyeddog/capture_6_.mp4
 			} else if a_on_b_not_none == 2 {
 				t1a = 0.0;
 				t1b = a_on_b[0].unwrap();

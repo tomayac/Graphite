@@ -3,6 +3,7 @@
 pub(crate) mod compare;
 
 mod bezier;
+mod compound_path;
 mod consts;
 mod subpath;
 mod utils;
