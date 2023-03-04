@@ -1769,25 +1769,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "graphite-wasm"
-version = "0.0.0"
-dependencies = [
- "bezier-rs",
- "graph-craft",
- "graphene-core",
- "graphite-document-legacy",
- "graphite-editor",
- "js-sys",
- "log",
- "ron",
- "serde",
- "serde-wasm-bindgen",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "wasm-bindgen-test",
-]
-
-[[package]]
 name = "graphite-wasm-svelte"
 version = "0.0.0"
 dependencies = [
@@ -5198,6 +5179,25 @@ name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
+
+[[package]]
+name = "wasm"
+version = "0.0.0"
+dependencies = [
+ "bezier-rs",
+ "graph-craft",
+ "graphene-core",
+ "graphite-document-legacy",
+ "graphite-editor",
+ "js-sys",
+ "log",
+ "ron",
+ "serde",
+ "serde-wasm-bindgen",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-test",
+]
 
 [[package]]
 name = "wasm-bindgen"

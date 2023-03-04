@@ -22,7 +22,7 @@ module.exports = {
 					new Plugin({
 						crateDirectory: path.resolve(__dirname, "wasm"),
 						// Remove when this issue is resolved: https://github.com/wasm-tool/wasm-pack-plugin/issues/93
-						outDir: path.resolve(__dirname, "wasm/pkg"),
+						outDir: path.resolve(__dirname, "graphite-wasm/pkg"),
 						watchDirectories: ["../editor", "../document-legacy", "../proc-macros", "../node-graph"].map((folder) => path.resolve(__dirname, folder)),
 					})
 			)

@@ -5,18 +5,20 @@ import * as path from "path";
 import vue from "@vitejs/plugin-vue";
 import license from "rollup-plugin-license";
 import { defineConfig } from "vite";
-import toplevelawait from "vite-plugin-top-level-await";
-import wasm from "vite-plugin-wasm";
+import wasmPack from 'vite-plugin-wasm-pack';
 import svgLoader from "vite-svg-loader";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [vue(), toplevelawait(), wasm(), svgLoader()],
+	plugins: [vue(), wasmPack(['wasm']) , svgLoader()],
 	resolve: {
 		extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"],
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
 		},
+	},
+	optimizeDeps: {
+		//exclude: ['graphite-wasm'],
 	},
 	build: {
 		rollupOptions: {
