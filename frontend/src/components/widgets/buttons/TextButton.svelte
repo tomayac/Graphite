@@ -7,6 +7,7 @@
 	export let label: string;
 	export let icon: IconName | undefined = undefined;
 	export let emphasized = false;
+	export let noBackground = false;
 	export let minWidth = 0;
 	export let disabled = false;
 	export let tooltip: string | undefined = undefined;
@@ -20,6 +21,7 @@
 <button
 	class="text-button"
 	class:emphasized
+	class:no-background={noBackground}
 	class:disabled
 	class:sharp-right-corners={sharpRightCorners}
 	style:min-width={minWidth > 0 ? `${minWidth}px` : undefined}
@@ -73,6 +75,14 @@
 
 			&.disabled {
 				--button-background-color: var(--color-8-uppergray);
+			}
+		}
+
+		&.no-background {
+			background: none;
+
+			&:hover {
+				background: var(--color-5-dullgray);
 			}
 		}
 
