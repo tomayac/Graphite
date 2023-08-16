@@ -3,8 +3,8 @@ title = "Web-based vector graphics editor and design tool"
 template = "section.html"
 
 [extra]
-css = ["/index.css"]
-js = ["/image-interaction.js", "/fundraising.js", "/video-embed.js"]
+css = ["index.css"]
+js = ["image-interaction.js", "fundraising.js", "video-embed.js"]
 +++
 
 <!-- ▛ LOGO ▜ -->
