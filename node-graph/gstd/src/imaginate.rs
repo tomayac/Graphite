@@ -492,31 +492,79 @@ fn base64_to_image<D: AsRef<[u8]>, P: Pixel>(base64_data: D) -> Result<Image<P>,
 }
 
 pub fn pick_safe_imaginate_resolution((width, height): (f64, f64)) -> (u64, u64) {
-	const MAX_RESOLUTION: u64 = 1000 * 1000;
+	const MODEL_INCREMENTS: u64 = 64;
+	const MODEL_RESOLUTION: u64 = 512;
 
-	// this is the maximum width/height that can be obtained
-	const MAX_DIMENSION: u64 = (MAX_RESOLUTION / 64) & !63;
+	const MIN_RESOLUTION: u64 = MODEL_RESOLUTION.pow(2);
+	const MAX_RESOLUTION: u64 = (MODEL_RESOLUTION * 2).pow(2);
 
-	// round the resolution to the nearest multiple of 64
-	let size = (DVec2::new(width, height).round().clamp(DVec2::ZERO, DVec2::splat(MAX_DIMENSION as _)).as_u64vec2() + U64Vec2::splat(32)).max(U64Vec2::splat(64)) & !U64Vec2::splat(63);
-	let resolution = size.x * size.y;
+	let width = width.max(64.);
+	let height = height.max(64.);
 
-	if resolution > MAX_RESOLUTION {
-		// scale down the image, so it is smaller than MAX_RESOLUTION
-		let scale = (MAX_RESOLUTION as f64 / resolution as f64).sqrt();
-		let size = size.as_dvec2() * scale;
+	let resolution = width * height;
+	let ar = width / height;
 
-		if size.x < 64.0 {
-			// the image is extremely wide
-			(64, MAX_DIMENSION)
-		} else if size.y < 64.0 {
-			// the image is extremely high
-			(MAX_DIMENSION, 64)
-		} else {
-			// round down to a multiple of 64, so that the resolution still is smaller than MAX_RESOLUTION
-			(size.as_u64vec2() & !U64Vec2::splat(63)).into()
-		}
+	let correction_factor = if resolution < MIN_RESOLUTION as f64 {
+		MIN_RESOLUTION as f64 / resolution
+	} else if resolution > MAX_RESOLUTION as f64 {
+		MAX_RESOLUTION as f64 / resolution
 	} else {
-		size.into()
+		1.
+	};
+	let area = resolution * correction_factor;
+
+	// Derived from the solution for `width` and `height` to the system of equations:
+	// `area = width * height`
+	// `ar = width / height`
+	let width = (area * ar).sqrt();
+	let height = width / ar;
+
+	let (width, height) = best_rounding_for_aspect_ratio(width, height, ar, MODEL_INCREMENTS);
+
+	(width, height)
+}
+
+/// Try the four permutations of rounding width and height up or down and use the one that is closest to the aspect ratio
+fn best_rounding_for_aspect_ratio(width: f64, height: f64, ar: f64, model_increments: u64) -> (u64, u64) {
+	debug_assert!(width > f64::EPSILON && height > f64::EPSILON && ar > f64::EPSILON && width.is_finite() && height.is_finite() && ar.is_finite());
+
+	let (width, height) = (width / model_increments as f64, height / model_increments as f64);
+
+	let floor_floor = (width.floor() as u64, height.floor() as u64);
+	let floor_ceil = (width.floor() as u64, height.ceil() as u64);
+	let ceil_floor = (width.ceil() as u64, height.floor() as u64);
+	let ceil_ceil = (width.ceil() as u64, height.ceil() as u64);
+
+	let floor_floor_ar = floor_floor.0 as f64 / floor_floor.1 as f64;
+	let floor_ceil_ar = floor_ceil.0 as f64 / floor_ceil.1 as f64;
+	let ceil_floor_ar = ceil_floor.0 as f64 / ceil_floor.1 as f64;
+	let ceil_ceil_ar = ceil_ceil.0 as f64 / ceil_ceil.1 as f64;
+
+	let floor_floor_error = (floor_floor, (floor_floor_ar - ar).abs());
+	let floor_ceil_error = (floor_ceil, (floor_ceil_ar - ar).abs());
+	let ceil_floor_error = (ceil_floor, (ceil_floor_ar - ar).abs());
+	let ceil_ceil_error = (ceil_ceil, (ceil_ceil_ar - ar).abs());
+
+	let least_error = [floor_floor_error, floor_ceil_error, ceil_floor_error, ceil_ceil_error]
+		.iter()
+		.min_by(|(_, error1), (_, error2)| error1.partial_cmp(error2).unwrap())
+		.unwrap()
+		.0;
+
+	(least_error.0 * model_increments, least_error.1 * model_increments)
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_pick_safe_imaginate_resolution() {
+		assert_eq!(pick_safe_imaginate_resolution((0., 0.)), (512, 512));
+		assert_eq!(pick_safe_imaginate_resolution((4096., 4096.)), (1024, 1024));
+		assert_eq!(pick_safe_imaginate_resolution((1024.0, 512.0)), (1024, 512));
+		assert_eq!(pick_safe_imaginate_resolution((512.0, 1024.0)), (512, 1024));
+		assert_eq!(pick_safe_imaginate_resolution((1024.0, 1024.0)), (1024, 1024));
+		assert_eq!(pick_safe_imaginate_resolution((1000.0, 500.0)), (1024, 512));
 	}
 }
