@@ -321,17 +321,15 @@ impl NodeGraphMessageHandler {
 				continue;
 			};
 
-			let primary_input = node
-				.inputs
-				.first()
+			let mut document_node_inputs = node.inputs.iter();
+			let document_node_primary_input = document_node_inputs.next();
+
+			let primary_input = document_node_primary_input
 				.filter(|input| input.is_exposed())
-				.and_then(|_| node_type.inputs.get(0))
+				.and_then(|_| node_type.primary_inputs)
 				.map(|input_type| input_type.data_type);
-			let exposed_inputs = node
-				.inputs
-				.iter()
+			let exposed_inputs = document_node_inputs
 				.zip(node_type.inputs.iter())
-				.skip(1)
 				.filter(|(input, _)| input.is_exposed())
 				.map(|(_, input_type)| NodeGraphInput {
 					data_type: input_type.data_type,
@@ -339,11 +337,14 @@ impl NodeGraphMessageHandler {
 				})
 				.collect();
 
-			let mut outputs = node_type.outputs.iter().map(|output_type| NodeGraphOutput {
+			let primary_output = node_type.primary_output.as_ref().map(|output_type| NodeGraphOutput {
 				data_type: output_type.data_type,
 				name: output_type.name.to_string(),
 			});
-			let primary_output = outputs.next();
+			let outputs = node_type.outputs.iter().map(|output_type| NodeGraphOutput {
+				data_type: output_type.data_type,
+				name: output_type.name.to_string(),
+			});
 
 			let graph_identifier = GraphIdentifier::new(layer_id);
 			let thumbnail_svg = executor.thumbnails.get(&graph_identifier).and_then(|thumbnails| thumbnails.get(id)).map(|svg| svg.to_string());
