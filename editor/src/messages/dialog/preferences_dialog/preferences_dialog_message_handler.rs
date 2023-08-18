@@ -1,3 +1,5 @@
+use graph_craft::imaginate_input::ImaginateServerBackend;
+
 use crate::messages::layout::utility_types::widget_prelude::*;
 use crate::messages::prelude::*;
 
@@ -41,13 +43,39 @@ impl PreferencesDialogMessageHandler {
 				.widget_holder(),
 		];
 
-		let imaginate_server_hostname = vec![
+		let imaginate_server_backend = vec![
 			TextLabel::new("Imaginate").min_width(60).italic(true).widget_holder(),
+			Separator::new(SeparatorType::Unrelated).widget_holder(),
+			RadioInput::new(vec![
+				// TODO Refresh the UI when this value changes
+				RadioEntryData::new("Hosted").on_update(|_| {
+					PreferencesMessage::ImaginateServerBackend {
+						backend: ImaginateServerBackend::Hosted,
+					}
+					.into()
+				}),
+				RadioEntryData::new("Local").on_update(|_| {
+					PreferencesMessage::ImaginateServerBackend {
+						backend: ImaginateServerBackend::Local,
+					}
+					.into()
+				}),
+			])
+			.selected_index(match preferences.imaginate_server_backend {
+				ImaginateServerBackend::Hosted => 0,
+				ImaginateServerBackend::Local => 1,
+			})
+			.widget_holder(),
+		];
+
+		let imaginate_server_hostname = vec![
+			TextLabel::new("").min_width(60).italic(true).widget_holder(),
 			TextLabel::new("Server Hostname").table_align(true).widget_holder(),
 			Separator::new(SeparatorType::Unrelated).widget_holder(),
 			TextInput::new(&preferences.imaginate_server_hostname)
 				.min_width(200)
 				.on_update(|text_input: &TextInput| PreferencesMessage::ImaginateServerHostname { hostname: text_input.value.clone() }.into())
+				.disabled(preferences.imaginate_server_backend == ImaginateServerBackend::Hosted)
 				.widget_holder(),
 		];
 
@@ -61,6 +89,7 @@ impl PreferencesDialogMessageHandler {
 				.max((1u64 << std::f64::MANTISSA_DIGITS) as f64)
 				.min_width(200)
 				.on_update(|number_input: &NumberInput| PreferencesMessage::ImaginateRefreshFrequency { seconds: number_input.value.unwrap() }.into())
+				.disabled(preferences.imaginate_server_backend == ImaginateServerBackend::Hosted)
 				.widget_holder(),
 		];
 
@@ -86,6 +115,7 @@ impl PreferencesDialogMessageHandler {
 				widgets: vec![TextLabel::new("Editor Preferences").bold(true).widget_holder()],
 			},
 			LayoutGroup::Row { widgets: zoom_with_scroll },
+			LayoutGroup::Row { widgets: imaginate_server_backend },
 			LayoutGroup::Row { widgets: imaginate_server_hostname },
 			LayoutGroup::Row { widgets: imaginate_refresh_frequency },
 			LayoutGroup::Row { widgets: button_widgets },

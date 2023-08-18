@@ -1,5 +1,6 @@
 use dyn_any::{DynAny, StaticType};
 use graphene_core::Color;
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::fmt::Debug;
 use std::sync::{
@@ -130,6 +131,13 @@ impl core::hash::Hash for ImaginateStatus {
 			Self::Failed(err) => err.hash(state),
 		}
 	}
+}
+
+#[derive(PartialEq, Eq, Clone, Copy, Default, Debug, Serialize, Deserialize, specta::Type)]
+pub enum ImaginateServerBackend {
+	#[default]
+	Hosted,
+	Local,
 }
 
 #[derive(PartialEq, Eq, Clone, Default, Debug)]

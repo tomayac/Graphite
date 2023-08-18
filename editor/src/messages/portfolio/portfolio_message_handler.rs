@@ -274,9 +274,13 @@ impl MessageHandler<PortfolioMessage, (&InputPreprocessorMessageHandler, &Prefer
 				responses.add(PropertiesPanelMessage::ResendActiveProperties);
 			}
 			PortfolioMessage::ImaginatePreferences => self.executor.update_imaginate_preferences(preferences.get_imaginate_preferences()),
+			PortfolioMessage::ImaginateServerBackend => {
+				debug!("setting imaginate persistent data");
+				self.persistent_data.imaginate.set_backend(preferences.imaginate_server_backend);
+			}
 			PortfolioMessage::ImaginateServerHostname => {
 				debug!("setting imaginate persistent data");
-				self.persistent_data.imaginate.set_host_name(&preferences.imaginate_server_hostname);
+				self.persistent_data.imaginate.set_hostname(&preferences.imaginate_server_hostname);
 			}
 			PortfolioMessage::Import => {
 				// This portfolio message wraps the frontend message so it can be listed as an action, which isn't possible for frontend messages

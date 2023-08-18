@@ -1,11 +1,12 @@
 use crate::messages::input_mapper::key_mapping::MappingVariant;
 use crate::messages::prelude::*;
-use graph_craft::imaginate_input::ImaginatePreferences;
+use graph_craft::imaginate_input::{ImaginatePreferences, ImaginateServerBackend};
 
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, specta::Type)]
 pub struct PreferencesMessageHandler {
+	pub imaginate_server_backend: ImaginateServerBackend,
 	pub imaginate_server_hostname: String,
 	pub imaginate_refresh_frequency: f64,
 	pub zoom_with_scroll: bool,
@@ -26,6 +27,7 @@ impl Default for PreferencesMessageHandler {
 			imaginate_server_hostname: host_name,
 			imaginate_refresh_frequency: 1.,
 			zoom_with_scroll: matches!(MappingVariant::default(), MappingVariant::ZoomWithScroll),
+			imaginate_server_backend: ImaginateServerBackend::Hosted,
 		}
 	}
 }
@@ -67,6 +69,13 @@ impl MessageHandler<PreferencesMessage, ()> for PreferencesMessageHandler {
 
 				self.imaginate_server_hostname = hostname;
 				responses.add(PortfolioMessage::ImaginateServerHostname);
+				responses.add(PortfolioMessage::ImaginateCheckServerStatus);
+				responses.add(PortfolioMessage::ImaginatePreferences);
+			}
+			PreferencesMessage::ImaginateServerBackend { backend } => {
+				self.imaginate_server_backend = backend;
+
+				responses.add(PortfolioMessage::ImaginateServerBackend);
 				responses.add(PortfolioMessage::ImaginateCheckServerStatus);
 				responses.add(PortfolioMessage::ImaginatePreferences);
 			}

@@ -1,11 +1,14 @@
 use crate::wasm_application_io::WasmEditorApi;
+use graph_craft::imaginate_input::{
+	ImaginateController, ImaginateMaskStartingFill, ImaginatePreferences, ImaginateSamplingMethod, ImaginateServerBackend, ImaginateServerStatus, ImaginateStatus, ImaginateTerminationHandle,
+};
+use graphene_core::application_io::NodeGraphUpdateMessage;
+use graphene_core::raster::{Color, Image, Luma, Pixel};
+
 use core::any::TypeId;
 use core::future::Future;
 use futures::{future::Either, TryFutureExt};
-use glam::{DVec2, U64Vec2};
-use graph_craft::imaginate_input::{ImaginateController, ImaginateMaskStartingFill, ImaginatePreferences, ImaginateSamplingMethod, ImaginateServerStatus, ImaginateStatus, ImaginateTerminationHandle};
-use graphene_core::application_io::NodeGraphUpdateMessage;
-use graphene_core::raster::{Color, Image, Luma, Pixel};
+use glam::DVec2;
 use image::{DynamicImage, ImageBuffer, ImageOutputFormat};
 use reqwest::Url;
 
@@ -33,7 +36,8 @@ fn new_get_request<U: reqwest::IntoUrl>(client: &reqwest::Client, url: U) -> Res
 
 pub struct ImaginatePersistentData {
 	pending_server_check: Option<futures::channel::oneshot::Receiver<reqwest::Result<reqwest::Response>>>,
-	host_name: Url,
+	backend: ImaginateServerBackend,
+	hostname: Url,
 	client: Option<reqwest::Client>,
 	server_status: ImaginateServerStatus,
 }
@@ -42,7 +46,7 @@ impl core::fmt::Debug for ImaginatePersistentData {
 	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
 		f.debug_struct(core::any::type_name::<Self>())
 			.field("pending_server_check", &self.pending_server_check.is_some())
-			.field("host_name", &self.host_name)
+			.field("host_name", &self.hostname)
 			.field("status", &self.server_status)
 			.finish()
 	}
@@ -55,7 +59,8 @@ impl Default for ImaginatePersistentData {
 		let ImaginatePreferences { host_name } = Default::default();
 		Self {
 			pending_server_check: None,
-			host_name: parse_url(&host_name).unwrap(),
+			backend: Default::default(),
+			hostname: parse_url(&host_name).unwrap(),
 			client,
 			server_status: status,
 		}
@@ -65,11 +70,15 @@ impl Default for ImaginatePersistentData {
 type ImaginateFuture = core::pin::Pin<Box<dyn Future<Output = ()> + 'static>>;
 
 impl ImaginatePersistentData {
-	pub fn set_host_name(&mut self, name: &str) {
+	pub fn set_hostname(&mut self, name: &str) {
 		match parse_url(name) {
-			Ok(url) => self.host_name = url,
+			Ok(url) => self.hostname = url,
 			Err(err) => self.server_status = ImaginateServerStatus::Failed(err.to_string()),
 		}
+	}
+
+	pub fn set_backend(&mut self, backend: ImaginateServerBackend) {
+		self.backend = backend;
 	}
 
 	fn initiate_server_check_maybe_fail(&mut self) -> Result<Option<ImaginateFuture>, Error> {
@@ -81,7 +90,7 @@ impl ImaginatePersistentData {
 			return Ok(None);
 		}
 		self.server_status = ImaginateServerStatus::Checking;
-		let url = join_url(&self.host_name, SDAPI_PROGRESS)?;
+		let url = join_url(&self.hostname, SDAPI_PROGRESS)?;
 		let request = new_get_request(client, url)?;
 		let (send, recv) = futures::channel::oneshot::channel();
 		let response_future = client.execute(request).map(move |r| {

@@ -64,6 +64,7 @@ pub enum PortfolioMessage {
 	ImaginateCheckServerStatus,
 	ImaginatePollServerStatus,
 	ImaginatePreferences,
+	ImaginateServerBackend,
 	ImaginateServerHostname,
 	Import,
 	LoadDocumentResources {
