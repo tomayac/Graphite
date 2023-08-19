@@ -29,13 +29,12 @@ impl PreferencesDialogMessageHandler {
 
 	fn layout(&self, preferences: &PreferencesMessageHandler) -> Layout {
 		let zoom_with_scroll = vec![
-			TextLabel::new("Input").min_width(60).italic(true).widget_holder(),
-			TextLabel::new("Zoom with Scroll").table_align(true).widget_holder(),
-			Separator::new(SeparatorType::Unrelated).widget_holder(),
+			TextLabel::new("Input").min_width(100).italic(true).widget_holder(),
+			TextLabel::new("Zoom with Scroll").min_width(120).widget_holder(),
 			CheckboxInput::new(preferences.zoom_with_scroll)
 				.tooltip("Use the scroll wheel for zooming instead of vertically panning (not recommended for trackpads)")
 				.on_update(|checkbox_input: &CheckboxInput| {
-					PreferencesMessage::ModifyLayout {
+					PreferencesMessage::InputZoomWithScroll {
 						zoom_with_scroll: checkbox_input.checked,
 					}
 					.into()
@@ -44,34 +43,47 @@ impl PreferencesDialogMessageHandler {
 		];
 
 		let imaginate_server_backend = vec![
-			TextLabel::new("Imaginate").min_width(60).italic(true).widget_holder(),
-			Separator::new(SeparatorType::Unrelated).widget_holder(),
+			TextLabel::new("Imaginate").min_width(100).italic(true).widget_holder(),
+			TextLabel::new("Server Backend").min_width(120).widget_holder(),
 			RadioInput::new(vec![
-				// TODO Refresh the UI when this value changes
-				RadioEntryData::new("Hosted").on_update(|_| {
-					PreferencesMessage::ImaginateServerBackend {
-						backend: ImaginateServerBackend::Hosted,
-					}
-					.into()
-				}),
-				RadioEntryData::new("Local").on_update(|_| {
-					PreferencesMessage::ImaginateServerBackend {
-						backend: ImaginateServerBackend::Local,
-					}
-					.into()
-				}),
+				RadioEntryData::new("Hosted")
+					.on_update(|_| {
+						PreferencesMessage::ImaginateServerBackend {
+							backend: ImaginateServerBackend::Hosted,
+						}
+						.into()
+					})
+					.tooltip("Hosted and paid for by the Graphite project. Please consider visiting the website to donate in order to keep this service running."),
+				RadioEntryData::new("Self-Hosted")
+					.on_update(|_| {
+						PreferencesMessage::ImaginateServerBackend {
+							backend: ImaginateServerBackend::Local,
+						}
+						.into()
+					})
+					.tooltip("Run your own server locally or on a remote machine. See the documentation for more information. This option provides several additional features."),
 			])
 			.selected_index(match preferences.imaginate_server_backend {
 				ImaginateServerBackend::Hosted => 0,
 				ImaginateServerBackend::Local => 1,
 			})
+			.expand_to_fit_width(true)
 			.widget_holder(),
+			Separator::new(SeparatorType::Related).widget_holder(),
+			IconButton::new("Info", 24)
+				.tooltip("Self-Hosting Documentation")
+				.on_update(|_| {
+					FrontendMessage::TriggerVisitLink {
+						url: "https://github.com/GraphiteEditor/Graphite/discussions/1089".to_string(),
+					}
+					.into()
+				})
+				.widget_holder(),
 		];
 
 		let imaginate_server_hostname = vec![
-			TextLabel::new("").min_width(60).italic(true).widget_holder(),
-			TextLabel::new("Server Hostname").table_align(true).widget_holder(),
-			Separator::new(SeparatorType::Unrelated).widget_holder(),
+			TextLabel::new("").min_width(100).italic(true).widget_holder(),
+			TextLabel::new("Server Hostname").min_width(120).widget_holder(),
 			TextInput::new(&preferences.imaginate_server_hostname)
 				.min_width(200)
 				.on_update(|text_input: &TextInput| PreferencesMessage::ImaginateServerHostname { hostname: text_input.value.clone() }.into())
@@ -80,9 +92,8 @@ impl PreferencesDialogMessageHandler {
 		];
 
 		let imaginate_refresh_frequency = vec![
-			TextLabel::new("").min_width(60).widget_holder(),
-			TextLabel::new("Refresh Frequency").table_align(true).widget_holder(),
-			Separator::new(SeparatorType::Unrelated).widget_holder(),
+			TextLabel::new("").min_width(100).widget_holder(),
+			TextLabel::new("Refresh Frequency").min_width(120).widget_holder(),
 			NumberInput::new(Some(preferences.imaginate_refresh_frequency))
 				.unit(" seconds")
 				.min(0.)

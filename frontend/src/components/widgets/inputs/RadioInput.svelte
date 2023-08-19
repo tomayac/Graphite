@@ -13,6 +13,7 @@
 	export let entries: RadioEntries;
 	export let selectedIndex: number;
 	export let disabled = false;
+	export let expandToFitWidth = false;
 	export let sharpRightCorners = false;
 
 	function handleEntryClick(radioEntryData: RadioEntryData) {
@@ -29,6 +30,7 @@
 			class:active={index === selectedIndex}
 			class:disabled
 			class:sharp-right-corners={index === entries.length - 1 && sharpRightCorners}
+			class:expand-to-fit-width={expandToFitWidth}
 			on:click={() => handleEntryClick(entry)}
 			title={entry.tooltip}
 			tabindex={index === selectedIndex ? -1 : 0}
@@ -91,6 +93,10 @@
 						fill: var(--color-2-mildblack);
 					}
 				}
+			}
+
+			&.expand-to-fit-width {
+				flex-grow: 1;
 			}
 
 			& + button {

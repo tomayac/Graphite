@@ -1002,6 +1002,8 @@ export class RadioInput extends WidgetProps {
 
 	disabled!: boolean;
 
+	expandToFitWidth!: boolean;
+
 	selectedIndex!: number;
 }
 

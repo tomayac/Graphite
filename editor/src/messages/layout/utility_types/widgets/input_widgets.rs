@@ -338,6 +338,9 @@ pub struct RadioInput {
 
 	pub disabled: bool,
 
+	#[serde(rename = "expandToFitWidth")]
+	pub expand_to_fit_width: bool,
+
 	// This uses `u32` instead of `usize` since it will be serialized as a normal JS number (replace this with `usize` after switching to a Rust-based GUI)
 	#[serde(rename = "selectedIndex")]
 	pub selected_index: u32,

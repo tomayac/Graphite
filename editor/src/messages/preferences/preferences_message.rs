@@ -13,5 +13,5 @@ pub enum PreferencesMessage {
 	ImaginateRefreshFrequency { seconds: f64 },
 	ImaginateServerHostname { hostname: String },
 	ImaginateServerBackend { backend: ImaginateServerBackend },
-	ModifyLayout { zoom_with_scroll: bool },
+	InputZoomWithScroll { zoom_with_scroll: bool },
 }

@@ -56,6 +56,10 @@
 			&.disabled {
 				background: var(--color-2-mildblack);
 				fill: var(--color-8-uppergray);
+
+				.floating-menu & {
+					background: var(--color-1-nearblack);
+				}
 			}
 		}
 

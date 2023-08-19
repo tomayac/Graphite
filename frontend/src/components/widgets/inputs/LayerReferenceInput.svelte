@@ -122,6 +122,10 @@
 		&.disabled {
 			background: var(--color-2-mildblack);
 
+			.floating-menu & {
+				background: var(--color-1-nearblack);
+			}
+
 			.drop-zone {
 				border: 1px dashed var(--color-4-dimgray);
 			}

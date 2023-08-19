@@ -75,11 +75,14 @@ impl MessageHandler<PreferencesMessage, ()> for PreferencesMessageHandler {
 			PreferencesMessage::ImaginateServerBackend { backend } => {
 				self.imaginate_server_backend = backend;
 
+				// Refresh the dialog widgets to update the disabled state of the widgets that depend on the user's backend choice
+				responses.add(DialogMessage::RequestPreferencesDialog);
+
 				responses.add(PortfolioMessage::ImaginateServerBackend);
 				responses.add(PortfolioMessage::ImaginateCheckServerStatus);
 				responses.add(PortfolioMessage::ImaginatePreferences);
 			}
-			PreferencesMessage::ModifyLayout { zoom_with_scroll } => {
+			PreferencesMessage::InputZoomWithScroll { zoom_with_scroll } => {
 				self.zoom_with_scroll = zoom_with_scroll;
 
 				let variant = match zoom_with_scroll {

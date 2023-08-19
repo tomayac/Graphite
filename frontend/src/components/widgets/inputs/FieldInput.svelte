@@ -192,6 +192,10 @@
 		&.disabled {
 			background: var(--color-2-mildblack);
 
+			.floating-menu & {
+				background: var(--color-1-nearblack);
+			}
+
 			label,
 			input,
 			textarea {
