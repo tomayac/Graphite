@@ -137,7 +137,23 @@ impl core::hash::Hash for ImaginateStatus {
 pub enum ImaginateServerBackend {
 	#[default]
 	Hosted,
-	Local,
+	SelfHosted,
+}
+
+impl ImaginateServerBackend {
+	pub fn supports_tiling(&self) -> bool {
+		match self {
+			ImaginateServerBackend::Hosted => false,
+			ImaginateServerBackend::SelfHosted => true,
+		}
+	}
+
+	pub fn supports_improve_faces(&self) -> bool {
+		match self {
+			ImaginateServerBackend::Hosted => false,
+			ImaginateServerBackend::SelfHosted => true,
+		}
+	}
 }
 
 #[derive(PartialEq, Eq, Clone, Default, Debug)]
@@ -145,7 +161,7 @@ pub enum ImaginateServerStatus {
 	#[default]
 	Unknown,
 	Checking,
-	Connected,
+	Connected(ImaginateServerBackend),
 	Failed(String),
 	Unavailable,
 }
@@ -154,7 +170,10 @@ impl ImaginateServerStatus {
 	pub fn to_text(&self) -> Cow<'static, str> {
 		match self {
 			Self::Unknown | Self::Checking => Cow::Borrowed("Checking..."),
-			Self::Connected => Cow::Borrowed("Connected"),
+			Self::Connected(backend) => Cow::Borrowed(match backend {
+				ImaginateServerBackend::Hosted => "Connected (Hosted)",
+				ImaginateServerBackend::SelfHosted => "Connected (Self-Hosted)",
+			}),
 			Self::Failed(err) => Cow::Owned(err.clone()),
 			Self::Unavailable => Cow::Borrowed("Unavailable"),
 		}

@@ -276,7 +276,7 @@ impl MessageHandler<PortfolioMessage, (&InputPreprocessorMessageHandler, &Prefer
 			PortfolioMessage::ImaginatePreferences => self.executor.update_imaginate_preferences(preferences.get_imaginate_preferences()),
 			PortfolioMessage::ImaginateServerBackend => {
 				debug!("setting imaginate persistent data");
-				self.persistent_data.imaginate.set_backend(preferences.imaginate_server_backend);
+				self.persistent_data.imaginate.backend = preferences.imaginate_server_backend;
 			}
 			PortfolioMessage::ImaginateServerHostname => {
 				debug!("setting imaginate persistent data");

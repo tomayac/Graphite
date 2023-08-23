@@ -57,7 +57,7 @@ impl PreferencesDialogMessageHandler {
 				RadioEntryData::new("Self-Hosted")
 					.on_update(|_| {
 						PreferencesMessage::ImaginateServerBackend {
-							backend: ImaginateServerBackend::Local,
+							backend: ImaginateServerBackend::SelfHosted,
 						}
 						.into()
 					})
@@ -65,7 +65,7 @@ impl PreferencesDialogMessageHandler {
 			])
 			.selected_index(match preferences.imaginate_server_backend {
 				ImaginateServerBackend::Hosted => 0,
-				ImaginateServerBackend::Local => 1,
+				ImaginateServerBackend::SelfHosted => 1,
 			})
 			.expand_to_fit_width(true)
 			.widget_holder(),
@@ -83,7 +83,10 @@ impl PreferencesDialogMessageHandler {
 
 		let imaginate_server_hostname = vec![
 			TextLabel::new("").min_width(100).italic(true).widget_holder(),
-			TextLabel::new("Server Hostname").min_width(120).widget_holder(),
+			TextLabel::new("Server Hostname")
+				.min_width(120)
+				.disabled(preferences.imaginate_server_backend == ImaginateServerBackend::Hosted)
+				.widget_holder(),
 			TextInput::new(&preferences.imaginate_server_hostname)
 				.min_width(200)
 				.on_update(|text_input: &TextInput| PreferencesMessage::ImaginateServerHostname { hostname: text_input.value.clone() }.into())
@@ -93,7 +96,10 @@ impl PreferencesDialogMessageHandler {
 
 		let imaginate_refresh_frequency = vec![
 			TextLabel::new("").min_width(100).widget_holder(),
-			TextLabel::new("Refresh Frequency").min_width(120).widget_holder(),
+			TextLabel::new("Refresh Frequency")
+				.min_width(120)
+				.disabled(preferences.imaginate_server_backend == ImaginateServerBackend::Hosted)
+				.widget_holder(),
 			NumberInput::new(Some(preferences.imaginate_refresh_frequency))
 				.unit(" seconds")
 				.min(0.)

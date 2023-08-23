@@ -35,8 +35,8 @@ fn new_get_request<U: reqwest::IntoUrl>(client: &reqwest::Client, url: U) -> Res
 }
 
 pub struct ImaginatePersistentData {
+	pub backend: ImaginateServerBackend,
 	pending_server_check: Option<futures::channel::oneshot::Receiver<reqwest::Result<reqwest::Response>>>,
-	backend: ImaginateServerBackend,
 	hostname: Url,
 	client: Option<reqwest::Client>,
 	server_status: ImaginateServerStatus,
@@ -77,10 +77,6 @@ impl ImaginatePersistentData {
 		}
 	}
 
-	pub fn set_backend(&mut self, backend: ImaginateServerBackend) {
-		self.backend = backend;
-	}
-
 	fn initiate_server_check_maybe_fail(&mut self) -> Result<Option<ImaginateFuture>, Error> {
 		use futures::future::FutureExt;
 		let Some(client) = &self.client else {
@@ -113,7 +109,7 @@ impl ImaginatePersistentData {
 	pub fn poll_server_check(&mut self) {
 		if let Some(mut check) = self.pending_server_check.take() {
 			self.server_status = match check.try_recv().map(|r| r.map(|r| r.and_then(reqwest::Response::error_for_status))) {
-				Ok(Some(Ok(_response))) => ImaginateServerStatus::Connected,
+				Ok(Some(Ok(_response))) => ImaginateServerStatus::Connected(self.backend),
 				Ok(Some(Err(_))) | Err(_) => ImaginateServerStatus::Unavailable,
 				Ok(None) => {
 					self.pending_server_check = Some(check);

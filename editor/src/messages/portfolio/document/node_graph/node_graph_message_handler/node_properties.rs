@@ -1714,7 +1714,18 @@ pub fn imaginate_properties(document_node: &DocumentNode, node_id: NodeId, conte
 	}
 
 	let improve_faces = {
-		let widgets = bool_widget(document_node, node_id, faces_index, "Improve Faces", true);
+		let mut widgets = bool_widget(document_node, node_id, faces_index, "Improve Faces", true);
+
+		let disabled = !context.persistent_data.imaginate.backend.supports_improve_faces();
+		for widget in &mut widgets {
+			if let Widget::TextLabel(label) = &mut widget.widget {
+				label.disabled = disabled;
+			}
+			if let Widget::CheckboxInput(checkbox) = &mut widget.widget {
+				checkbox.disabled = disabled;
+			}
+		}
+
 		LayoutGroup::Row { widgets }.with_tooltip(
 			"Postprocess human (or human-like) faces to look subtly less distorted.\n\
 			\n\
@@ -1722,7 +1733,18 @@ pub fn imaginate_properties(document_node: &DocumentNode, node_id: NodeId, conte
 		)
 	};
 	let tiling = {
-		let widgets = bool_widget(document_node, node_id, tiling_index, "Tiling", true);
+		let mut widgets = bool_widget(document_node, node_id, tiling_index, "Tiling", true);
+
+		let disabled = !context.persistent_data.imaginate.backend.supports_tiling();
+		for widget in &mut widgets {
+			if let Widget::TextLabel(label) = &mut widget.widget {
+				label.disabled = disabled;
+			}
+			if let Widget::CheckboxInput(checkbox) = &mut widget.widget {
+				checkbox.disabled = disabled;
+			}
+		}
+
 		LayoutGroup::Row { widgets }.with_tooltip("Generate the image so its edges loop seamlessly to make repeatable patterns or textures")
 	};
 	layout.extend_from_slice(&[improve_faces, tiling]);
