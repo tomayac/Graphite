@@ -5,12 +5,9 @@ page_template = "book.html"
 
 [extra]
 order = 2 # Chapter number
-js = ["video-embed.js"]
 +++
 
-<div class="video-embed aspect-16x9">
-	<img data-video-embed="vUzIeg8frh4" src="https://static.graphite.rs/content/volunteer/guide/workshop-intro-to-coding-for-graphite-youtube.avif" onerror="this.onerror = null; this.src = this.src.replace('.avif', '.png')" alt="Workshop: Intro to Coding for Graphite" />
-</div>
+{{ youtube(id="vUzIeg8frh4", image="https://static.graphite.rs/content/volunteer/guide/workshop-intro-to-coding-for-graphite-youtube.avif", title="Workshop: Intro to Coding for Graphite") }}
 
 The Graphite editor is built as a web app powered by Svelte in the frontend and Rust in the backend which is compiled to WebAssembly (wasm) and run in the browser.
 

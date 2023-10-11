@@ -4,7 +4,7 @@ template = "section.html"
 
 [extra]
 css = ["index.css"]
-js = ["image-interaction.js", "fundraising.js", "video-embed.js"]
+js = ["image-interaction.js", "fundraising.js"]
 +++
 
 <!-- ▛ LOGO ▜ -->
@@ -474,9 +474,7 @@ Stop jumping between programs. Planned features will make Graphite a first-class
 <!-- ▛ DEMO VIDEO ▜ -->
 <section id="demo-video">
 	<div class="section">
-		<div class="video-embed aspect-16x9">
-			<img data-video-embed="JgJvAHQLnXA" src="https://static.graphite.rs/content/index/commander-basstronaut-youtube.avif" onerror="this.onerror = null; this.src = this.src.replace('.avif', '.png')" alt="Graphite - Vector Editing: &quot;Commander Basstronaut&quot; Artwork (25x Timelapse)" />
-		</div>
+		{{ youtube(id="JgJvAHQLnXA", image="https://static.graphite.rs/content/index/commander-basstronaut-youtube.avif", title="Graphite - Vector Editing: &quot;Commander Basstronaut&quot; Artwork (25x Timelapse)") }}
 	</div>
 </section>
 <!-- ▙ DEMO VIDEO ▟ -->

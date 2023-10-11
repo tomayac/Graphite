@@ -77,6 +77,9 @@ Marrying vector and raster under one roof enables both art forms to complement e
 </section>
 
 <section>
+
+<div class="diptych">
+
 <div class="section">
 
 ## Roadmap
@@ -301,4 +304,28 @@ Marrying vector and raster under one roof enables both art forms to complement e
 </div>
 
 </div>
+
+<div class="section">
+
+## Sprint Summaries
+
+<div class="roadmap">
+
+### Sprint 2
+
+- The team has grown from 1 to 5 in the past month and major progress was made building core architectural Rust code. A large accomplishment was designing the software architecture diagram.
+- The current editor now has functional Select, Rectangle, and Ellipse tools thanks to the newly-added tool state machine and SVG viewport drawing. The UI now also implements tool-related icons and buttons, bringing it closer to parity with the design mockup. The team also set up a Web/Rust-WASM build system, GitHub CI to confirm PRs compile, and put together starter documentation for the codebase, UX design, and manual.
+- Graphite is making rapid progress towards becoming a nondestructive, procedural graphics editor suitable of replacing traditional 2D DCC applications. Please [join the Discord](https://discord.graphite.rs) - and consider asking for a tour of the code and how you can help!
+
+### Sprint 1
+
+- The past year's in-development custom GUI has been shelved in lieu of an interim web GUI. Graphite intends to natively support Windows, Mac, Linux, and Web. This change unblocks core application development but means Graphite is Web-only until the Rust GUI ecosystem matures. Good progress this month has been made building the web GUI with Vue.
+- Graphite 0.1 will now support only vector editing. This defers the large complexity of the graph render engine required for node-based raster editing. It should be less difficult to first focus on building a vector editor that improves upon the UX of Illustrator and Inkscape.
+
+</div>
+
+</div>
+
+</div>
+
 </section>
